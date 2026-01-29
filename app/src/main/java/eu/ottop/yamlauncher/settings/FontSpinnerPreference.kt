@@ -14,6 +14,8 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
+import eu.ottop.yamlauncher.R
+import java.io.File
 
 class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Preference(context, attrs) {
 
