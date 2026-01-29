@@ -6,6 +6,11 @@
 - Android Studio 2022.1.0 或更高版本（可选）
 - Git
 
+### 系统要求
+- Android 5.0 (API 21) 或更高版本
+- 完全兼容Android Go设备
+- RAM: 建议512MB以上
+
 ## 克隆项目
 
 ```bash

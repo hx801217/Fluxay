@@ -13,8 +13,11 @@
 - ✅ 所有源码包名已重命名
 
 ### 2. Android Go适配
-- ✅ 最低SDK提升至28 (Android 9.0)
-- ✅ 添加内存优化配置
+- ✅ 最低SDK: 21 (Android 5.0 Lollipop)
+- ✅ 完全兼容Android Go设备
+- ✅ 优化内存使用（RAM < 2GB）
+- ✅ 仅包含必要架构（armeabi-v7a, arm64-v8a）
+- ✅ 支持低配置设备
 - ✅ 轻量化设计
 - ✅ 减少后台资源占用
 
@@ -107,12 +110,13 @@
 ## 技术栈
 
 - **语言**: Kotlin
-- **最低SDK**: 28 (Android 9.0)
+- **最低SDK**: 21 (Android 5.0 Lollipop) - 兼容Android Go
 - **目标SDK**: 36 (Android 14)
 - **编译SDK**: 36
 - **Gradle**: 8.13.2
 - **Kotlin**: 2.2.0
 - **JVM**: Java 17
+- **支持架构**: armeabi-v7a, arm64-v8a
 
 ## 构建和使用
 

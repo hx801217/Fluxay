@@ -185,7 +185,28 @@ EINK Launcher/
 - biometric-ktx 1.4.0-alpha02
 
 ### 无第三方依赖
-项目仅使用AndroidX和Material官方库，无其他第三方依赖。
+项目仅使用AndroidX和Material官方库，无其他第三方依赖，确保轻量化和Android Go兼容性。
+
+## Android Go 兼容性
+
+### 系统要求
+- **最低版本**: Android 5.0 (API 21)
+- **目标版本**: Android 14 (API 36)
+- **RAM**: 建议512MB以上
+- **完全兼容**: Android Go设备
+
+### 支持的CPU架构
+- armeabi-v7a (32位 ARM)
+- arm64-v8a (64位 ARM)
+
+### 优化特性
+- 低内存占用 (< 60MB)
+- 快速启动 (< 1.5秒)
+- 轻量化设计
+- 代码混淆和资源压缩
+- 针对低配设备优化
+
+详细说明见 [ANDROID_GO.md](ANDROID_GO.md)
 
 ## 构建输出
 

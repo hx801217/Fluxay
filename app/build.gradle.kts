@@ -9,13 +9,19 @@ android {
 
     defaultConfig {
         applicationId = "com.eink.launcher"
-        minSdk = 28
+        minSdk = 21  // Android 5.0 Lollipop - 兼容Android Go设备
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
 
         vectorDrawables {
             useSupportLibrary = true
+        }
+
+        // Android Go 优化配置
+        ndk {
+            abiFilters.add("armeabi-v7a")
+            abiFilters.add("arm64-v8a")
         }
     }
 
@@ -47,8 +53,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+    kotlin {
+        jvmToolchain(17)
     }
     buildFeatures {
         viewBinding = true

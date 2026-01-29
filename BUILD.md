@@ -20,8 +20,11 @@
 - 专为EINK屏幕优化的字体渲染
 
 ### Android Go支持
-- 最低SDK 28 (Android 9.0)
-- 优化内存使用
+- 最低SDK 21 (Android 5.0 Lollipop)
+- 完全兼容Android Go设备（轻量级Android版本）
+- 优化内存使用（RAM < 2GB设备）
+- 支持低配置设备
+- 仅包含必要的架构（armeabi-v7a, arm64-v8a）
 - 轻量化设计
 - 减少后台资源占用
 

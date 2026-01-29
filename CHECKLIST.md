@@ -10,8 +10,11 @@
 - [x] 旧包目录已删除
 
 ### 2. Android Go适配
-- [x] 最低SDK提升至28 (Android 9.0)
-- [x] 添加内存优化配置
+- [x] 最低SDK: 21 (Android 5.0 Lollipop)
+- [x] 完全兼容Android Go设备
+- [x] 优化内存使用（RAM < 2GB）
+- [x] 仅包含必要架构（armeabi-v7a, arm64-v8a）
+- [x] 支持低配置设备
 - [x] 轻量化设计
 - [x] 减少后台资源占用
 - [x] 优化启动性能
