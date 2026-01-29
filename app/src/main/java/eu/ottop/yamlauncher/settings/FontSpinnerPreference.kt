@@ -197,7 +197,9 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     }
 
     override fun onClick() {
-        spinner?.performClick()
+        // Don't automatically open the spinner dropdown
+        // This prevents accidental opening when clicking the preference title
+        // Users need to click directly on the spinner to change the font
     }
 
     override fun onAttached() {
