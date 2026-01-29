@@ -2,6 +2,7 @@
 
 ## 问题描述
 
+### 第一次错误
 GitHub Actions 构建失败，错误信息：
 ```
 Android resource linking failed
@@ -10,9 +11,19 @@ ERROR: resource array/size_options (aka com.eink.launcher:array/size_options) no
 ... (多个数组资源缺失)
 ```
 
+### 第二次错误
+修复第一次错误后，出现资源重复错误：
+```
+ERROR: Duplicate resources - array/bg_values exists in both arrays.xml and arrays_common.xml
+ERROR: Duplicate resources - array/color_values exists in both arrays.xml and arrays_common.xml
+... (多个数组资源重复)
+```
+
 ## 根本原因
 
-在重命名包名和添加新功能时，未将原始项目中的 `arrays_common.xml` 文件的内容合并到 `arrays.xml`，导致多个必需的数组资源定义缺失。
+1. **第一次错误**: 在重命名包名时，未将原始项目中的 `arrays_common.xml` 文件的内容合并到 `arrays.xml`，导致多个必需的数组资源定义缺失。
+
+2. **第二次错误**: 在第一次修复时，将 `arrays_common.xml` 的内容添加到 `arrays.xml`，但没有删除原始的 `arrays_common.xml` 文件，导致资源重复。
 
 ## 修复方案
 
@@ -63,6 +74,7 @@ kotlin {
 ## 修复的文件
 
 - ✅ `app/src/main/res/values/arrays.xml` - 添加所有缺失的数组定义
+- ✅ `app/src/main/res/values/arrays_common.xml` - **已删除**（避免资源重复）
 - ✅ `app/build.gradle.kts` - 修复 Kotlin JVM 目标设置警告
 
 ## 验证
@@ -148,9 +160,27 @@ kotlinOptions {
 修复后，构建应该能够：
 1. ✅ 成功编译所有资源
 2. ✅ 链接所有数组资源
-3. ✅ 生成 Debug APK
-4. ✅ 生成 Release APK
-5. ✅ 无警告信息
+3. ✅ 无资源重复错误
+4. ✅ 生成 Debug APK
+5. ✅ 生成 Release APK
+6. ✅ 无 Gradle 警告信息
+
+## 重要说明
+
+### 为什么删除 arrays_common.xml
+
+原始项目使用 `arrays_common.xml` 存储通用的数组资源，但为了简化项目结构，我们选择：
+1. 将所有数组资源合并到 `arrays.xml`
+2. 删除 `arrays_common.xml` 避免重复
+3. 保持资源文件简洁明了
+
+### 数组资源组织
+
+现在所有数组资源都在 `app/src/main/res/values/arrays.xml` 中，包括：
+- General UI 数组
+- Home and App Menu 数组
+- Weather 数组
+- EINK 新增数组
 
 ## 相关文档
 
@@ -161,3 +191,4 @@ kotlinOptions {
 
 修复完成时间: 2026年1月29日
 版本: 1.0.0
+
