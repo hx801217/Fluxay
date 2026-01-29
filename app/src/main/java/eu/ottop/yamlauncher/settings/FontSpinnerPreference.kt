@@ -1,18 +1,19 @@
 package eu.ottop.yamlauncher.settings
 
-import android.app.AlertDialog
+import android.app.Activity
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import androidx.fragment.app.FragmentActivity
-import eu.ottop.yamlauncher.R
 
 class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Preference(context, attrs) {
 
@@ -21,7 +22,12 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     private var currentValue: String? = null
     private var defaultNo: String? = null
     private var spinner: Spinner? = null
-    private var customFontDialog: CustomFontDialog? = null
+    private var activity: Activity? = null
+
+    companion object {
+        private const val TAG = "FontSpinnerPreference"
+        private const val REQUEST_CODE_PICK_FONT = 1001
+    }
 
     init {
         widgetLayoutResource = R.layout.preference_spinner
@@ -44,6 +50,9 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         super.onBindViewHolder(holder)
         spinner = holder.findViewById(R.id.preferenceOptions) as Spinner
 
+        // Get activity from context
+        activity = context as? Activity
+
         if (entries != null) {
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, entries!!)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -53,7 +62,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         val selectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: entryValues?.indexOf(defaultNo as CharSequence) ?: 0
         spinner?.setSelection(selectedIndex)
 
-        val handler = Handler(Looper.getMainLooper())
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
         handler.postDelayed({
             if (selectedIndex >= 0) {
                 summary = entries?.get(selectedIndex)
@@ -66,7 +75,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
                 // Check if custom font is selected
                 if (newValue == "custom") {
-                    showCustomFontDialog()
+                    openFontPicker()
                     // Reset to current value until user selects a font
                     val currentSelectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: 0
                     spinner?.post {
@@ -86,20 +95,89 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         }
     }
 
-    private fun showCustomFontDialog() {
-        if (context !is FragmentActivity) {
-            return
-        }
+    private fun openFontPicker() {
+        try {
+            Log.d(TAG, "Opening font picker")
 
-        customFontDialog = CustomFontDialog(context as FragmentActivity)
-        customFontDialog?.setOnFontSelectedListener { fontPath ->
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "*/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
+
+            activity?.startActivityForResult(intent, REQUEST_CODE_PICK_FONT)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open font picker", e)
+            Toast.makeText(context, "Failed to open file picker", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d(TAG, "onActivityResult: requestCode=$requestCode, resultCode=$resultCode")
+
+        if (requestCode == REQUEST_CODE_PICK_FONT && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+                importFontFile(uri)
+            }
+        }
+    }
+
+    private fun importFontFile(uri: Uri) {
+        try {
+            Log.d(TAG, "Importing font from URI: $uri")
+
+            val customFontDir = context.filesDir?.let { File(it, "custom_fonts") }
+                ?: return
+
+            if (!customFontDir.exists()) {
+                customFontDir.mkdirs()
+            }
+
+            val fileName = getFileName(uri) ?: "custom_font_${System.currentTimeMillis()}.ttf"
+            val outputFile = File(customFontDir, fileName)
+
+            Log.d(TAG, "Saving font to: ${outputFile.absolutePath}")
+
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                outputFile.outputStream().use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            Log.d(TAG, "Font imported successfully: $fileName")
+
+            // Set the custom font as the current value
+            val fontPath = "custom:$fileName"
             if (callChangeListener(fontPath)) {
                 currentValue = fontPath
                 persistString(fontPath)
-                summary = "Custom: ${fontPath.substringAfter("custom:")}"
+                summary = "Custom: $fileName"
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to import font", e)
+            Toast.makeText(context, "Failed to import font: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val index = cursor.getColumnIndex("_display_name")
+                    if (index >= 0) {
+                        result = cursor.getString(index)
+                    }
+                }
             }
         }
-        customFontDialog?.show()
+        if (result == null) {
+            result = uri.path
+            val cut = result?.lastIndexOf('/')
+            if (cut != -1) {
+                result = result?.substring(cut!! + 1)
+            }
+        }
+        return result
     }
 
     override fun onClick() {
