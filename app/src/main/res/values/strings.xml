@@ -156,9 +156,9 @@
 
     <string name="about">About</string>
     <!--About Page Items-->
-    <string name="about_title">About YAM Launcher</string>
+    <string name="about_title">About Fluxay-Launcher</string>
     <string name="app_icon">App Icon</string>
-    <string name="creditName">created by Otto, maintained by ThomasNow Productions</string>
+    <string name="creditName">Fluxay-Launcher</string>
     <string name="source_code">Source Code</string>
     <string name="codeberg">Codeberg</string>
     <string name="github">GitHub</string>
@@ -168,7 +168,7 @@
     <string name="install_play">Install on Google Play</string>
 
     <string name="reset">Reset</string>
-    <string name="restart_text">Restart YAM Launcher</string>
+    <string name="restart_text">Restart Fluxay-Launcher</string>
     <string name="reset_text">Reset All Settings</string>
     <string name="reset_confirm_text">You will lose ALL changes that you have made to the launcher settings, shortcuts, hidden apps, etc.\n\nAre you sure?</string>
 
@@ -181,20 +181,20 @@
     <string name="backup_fail">Backup failed :(</string>
     <string name="restore_success">Restore successful :)</string>
     <string name="restore_fail">Restore failed :( (corrupt file?)</string>
-    <string name="restore_wrong_app">Not a YAM Launcher backup</string>
+    <string name="restore_wrong_app">Not a Fluxay-Launcher backup</string>
     <string name="restore_error">Failed to read file</string>
 
     <!--Location Selector Items-->
     <string name="region_text">%1$s%2$s</string>
 
     <!--Double tap to lock-->
-    <string name="screenlock_confirmation">To lock with double tap, enable YAM Launcher in accessibility settings.</string>
-    <string name="accessibility_service_description">The permission is required for double tap to work for locking the screen.\n\nIt is only needed if you want to use the double tap to lock screen feature in YAM Launcher.</string>
+    <string name="screenlock_confirmation">To lock with double tap, enable Fluxay-Launcher in accessibility settings.</string>
+    <string name="accessibility_service_description">The permission is required for double tap to work for locking the screen.\n\nIt is only needed if you want to use the double tap to lock screen feature in Fluxay-Launcher.</string>
 
     <string name="text_authentication_cancel">Authentication Cancel.</string>
     <string name="text_authentication_error">Authentication error: %1$s (code %2$d)</string>
     <string name="text_authentication_failed">Authentication failed.</string>
-    <string name="text_biometric_login">Unlock YAM Launcher Settings</string>
+    <string name="text_biometric_login">Unlock Fluxay-Launcher Settings</string>
     <string name="text_biometric_login_app">Biometric login for %1$s</string>
     <string name="text_biometric_login_sub">Log in using your biometric credentials.</string>
 
