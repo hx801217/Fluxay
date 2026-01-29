@@ -120,6 +120,17 @@ defaultConfig {
 - 仅包含ARM架构，减小APK体积
 - 优化内存使用
 
+## ⚠️ 构建警告（可忽略）
+
+构建过程中可能会出现以下警告，这些警告不影响构建：
+
+```
+warn: removing resource com.eink.launcher:array/reply_entries without required default value.
+warn: removing resource com.eink.launcher:array/reply_values without required default value.
+```
+
+**说明**: 这些资源存在于其他语言版本的arrays.xml中，但没有在主values/arrays.xml中定义。这些是原始项目的遗留代码，当前未使用，可以安全忽略。
+
 ## ✅ 验证清单
 
 ### 资源文件

@@ -24,6 +24,7 @@ object EInkHelper {
             window.setDecorFitsSystemWindows(true)
             window.insetsController?.let { controller ->
                 controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                // 使用BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE的值
                 controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
         } else {
