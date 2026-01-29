@@ -16,6 +16,7 @@
     </string-array>
 
     <string-array name="font_options">
+        <item>自定义</item>
         <item>系统</item>
         <item>Arbutus</item>
         <item>Casual</item>
@@ -32,7 +33,6 @@
         <item>Ubuntu Light</item>
         <item>Ubuntu Condensed Regular</item>
         <item>Workbench</item>
-        <item>自定义</item>
     </string-array>
 
     <string-array name="style_options">
