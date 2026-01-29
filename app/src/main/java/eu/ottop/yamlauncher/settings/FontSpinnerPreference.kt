@@ -1,10 +1,8 @@
 package eu.ottop.yamlauncher.settings
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -19,16 +17,24 @@ import java.io.File
 
 class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Preference(context, attrs) {
 
+    interface FontPickerCallback {
+        fun startActivityForResultForFontPicker(intent: Intent, requestCode: Int)
+    }
+
     private var entries: Array<CharSequence>? = null
     private var entryValues: Array<CharSequence>? = null
     private var currentValue: String? = null
     private var defaultNo: String? = null
     private var spinner: Spinner? = null
-    private var activity: Activity? = null
+    private var callback: FontPickerCallback? = null
 
     companion object {
         private const val TAG = "FontSpinnerPreference"
-        private const val REQUEST_CODE_PICK_FONT = 1001
+        const val REQUEST_CODE_PICK_FONT = 1001
+    }
+
+    fun setCallback(callback: FontPickerCallback) {
+        this.callback = callback
     }
 
     init {
@@ -55,6 +61,10 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         // Get activity from context
         activity = context as? Activity
 
+        if (activity == null) {
+            Log.e(TAG, "Activity is null, font picker may not work")
+        }
+
         if (entries != null) {
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, entries!!)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -77,6 +87,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
                 // Check if custom font is selected
                 if (newValue == "custom") {
+                    Log.d(TAG, "Custom font selected, opening picker")
                     openFontPicker()
                     // Reset to current value until user selects a font
                     val currentSelectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: 0
@@ -106,7 +117,11 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                 addCategory(Intent.CATEGORY_OPENABLE)
             }
 
-            activity?.startActivityForResult(intent, REQUEST_CODE_PICK_FONT)
+            callback?.startActivityForResultForFontPicker(intent, REQUEST_CODE_PICK_FONT)
+                ?: run {
+                    Log.e(TAG, "Callback is null, cannot open font picker")
+                    Toast.makeText(context, "Font picker not available", Toast.LENGTH_SHORT).show()
+                }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open font picker", e)
             Toast.makeText(context, "Failed to open file picker", Toast.LENGTH_SHORT).show()
