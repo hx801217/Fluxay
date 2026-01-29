@@ -213,10 +213,10 @@ class UIUtils(private val context: Context) {
     }
 
     fun setFont(view: TextView) {
-        var font = sharedPreferenceManager.getTextFont()
+        val font = sharedPreferenceManager.getTextFont()
         val style = sharedPreferenceManager.getTextStyle()
 
-        val newFont = when (font) {
+        val newFont: Typeface = when (font) {
             "system" -> {
                 val typedArray = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault, intArrayOf(android.R.attr.fontFamily))
                 val systemFont = typedArray.getString(0)
@@ -244,19 +244,19 @@ class UIUtils(private val context: Context) {
                     val fontManager = FontManager.getInstance(context)
                     val fontTypeface = fontManager.getFont(fontName)
                     if (fontTypeface != null) {
-                        newFont = fontTypeface
+                        fontTypeface
                     } else {
                         // Fallback to default if custom font not found
-                        newFont = Typeface.DEFAULT
+                        Typeface.DEFAULT
                     }
                 } else {
                     // For FontMap fonts
-                    val fontId = font?.let { FontMap.fonts[it] }
+                    val fontId = FontMap.fonts[font]
                     if (fontId != null) {
-                        newFont = ResourcesCompat.getFont(context, fontId)
+                        ResourcesCompat.getFont(context, fontId)
                     } else {
                         // Fallback to default if font not found
-                        newFont = Typeface.DEFAULT
+                        Typeface.DEFAULT
                     }
                 }
             }
