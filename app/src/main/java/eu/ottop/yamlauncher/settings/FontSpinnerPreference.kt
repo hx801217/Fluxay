@@ -1,5 +1,6 @@
 package eu.ottop.yamlauncher.settings
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -57,13 +58,6 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
         spinner = holder.findViewById(R.id.preferenceOptions) as Spinner
-
-        // Get activity from context
-        activity = context as? Activity
-
-        if (activity == null) {
-            Log.e(TAG, "Activity is null, font picker may not work")
-        }
 
         if (entries != null) {
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, entries!!)
