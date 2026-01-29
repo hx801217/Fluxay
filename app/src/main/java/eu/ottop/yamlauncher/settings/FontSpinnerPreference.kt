@@ -70,7 +70,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                     // Reset to current value until user selects a font
                     val currentSelectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: 0
                     spinner?.post {
-                        setSelection(currentSelectedIndex)
+                        spinner?.setSelection(currentSelectedIndex)
                     }
                     return@onItemSelected
                 }
