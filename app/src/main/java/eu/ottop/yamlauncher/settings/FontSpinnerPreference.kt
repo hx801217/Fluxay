@@ -28,6 +28,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     private var defaultNo: String? = null
     private var spinner: Spinner? = null
     private var callback: FontPickerCallback? = null
+    private var isUserAction = false // Flag to distinguish between user action and programmatic changes
 
     companion object {
         private const val TAG = "FontSpinnerPreference"
@@ -197,9 +198,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     }
 
     override fun onClick() {
-        // Don't automatically open the spinner dropdown
-        // This prevents accidental opening when clicking the preference title
-        // Users need to click directly on the spinner to change the font
+        spinner?.performClick()
     }
 
     override fun onAttached() {
