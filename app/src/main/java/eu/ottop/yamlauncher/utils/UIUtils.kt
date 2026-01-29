@@ -238,13 +238,26 @@ class UIUtils(private val context: Context) {
                 Typeface.create(font, Typeface.NORMAL)
             }
             else -> {
-                // For custom fonts, get from FontMap
-                val fontId = FontMap.fonts[font]
-                if (fontId != null) {
-                    ResourcesCompat.getFont(context, fontId)
+                // For custom fonts, use FontManager
+                if (font.startsWith("custom:")) {
+                    val fontName = font.substringAfter("custom:")
+                    val fontManager = FontManager.getInstance(context)
+                    val fontTypeface = fontManager.getFont(fontName)
+                    if (fontTypeface != null) {
+                        fontTypeface
+                    } else {
+                        // Fallback to default if custom font not found
+                        Typeface.DEFAULT
+                    }
                 } else {
-                    // Fallback to default if font not found
-                    Typeface.DEFAULT
+                    // For FontMap fonts
+                    val fontId = FontMap.fonts[font]
+                    if (fontId != null) {
+                        ResourcesCompat.getFont(context, fontId)
+                    } else {
+                        // Fallback to default if font not found
+                        Typeface.DEFAULT
+                    }
                 }
             }
         }
