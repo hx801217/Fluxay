@@ -63,14 +63,18 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                 val newValue = entryValues?.get(position).toString()
-                
+
                 // Check if custom font is selected
                 if (newValue == "custom") {
                     showCustomFontDialog()
                     // Reset to current value until user selects a font
+                    val currentSelectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: 0
+                    spinner?.post {
+                        setSelection(currentSelectedIndex)
+                    }
                     return@onItemSelected
                 }
-                
+
                 if (callChangeListener(newValue)) {
                     currentValue = newValue
                     persistString(newValue)

@@ -19,6 +19,7 @@ class CustomFontDialog(private val activity: FragmentActivity) {
     private val customFontDir = File(activity.filesDir, "custom_fonts")
     private var onFontSelected: ((String) -> Unit)? = null
     private var performFilePicker: ActivityResultLauncher<Intent>? = null
+    private var currentDialog: AlertDialog? = null
 
     init {
         // Create custom fonts directory if it doesn't exist
@@ -33,17 +34,17 @@ class CustomFontDialog(private val activity: FragmentActivity) {
 
     fun show() {
         val customFonts = listCustomFonts()
-        
+
         val dialogView = LayoutInflater.from(activity)
             .inflate(R.layout.dialog_custom_font, null)
-        
+
         val listView = dialogView.findViewById<ListView>(R.id.customFontList)
         val adapter = ArrayAdapter(activity, android.R.layout.simple_list_item_1, customFonts)
         listView.adapter = adapter
 
         listView.setOnItemClickListener { _, _, position, _ ->
             onFontSelected?.invoke("custom:${customFonts[position]}")
-            return@setOnItemClickListener
+            currentDialog?.dismiss()
         }
 
         val dialog = AlertDialog.Builder(activity)
@@ -52,14 +53,18 @@ class CustomFontDialog(private val activity: FragmentActivity) {
             .setPositiveButton(R.string.import_font) { _, _ ->
                 openFontPicker()
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setNegativeButton(R.string.cancel) { _, _ ->
+                currentDialog = null
+            }
             .create()
+
+        currentDialog = dialog
 
         // Initialize file picker after dialog creation
         performFilePicker = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-                    importFontFile(uri, dialog)
+                    importFontFile(uri)
                 }
             }
         }
@@ -76,7 +81,7 @@ class CustomFontDialog(private val activity: FragmentActivity) {
         performFilePicker?.launch(Intent.createChooser(intent, "Select Font File"))
     }
 
-    private fun importFontFile(uri: Uri, dialog: AlertDialog) {
+    private fun importFontFile(uri: Uri) {
         try {
             val inputStream = activity.contentResolver.openInputStream(uri)
             val fileName = getFileName(uri) ?: "custom_font_${System.currentTimeMillis()}.ttf"
@@ -89,7 +94,7 @@ class CustomFontDialog(private val activity: FragmentActivity) {
             }
 
             // Refresh the dialog with new font list
-            dialog.dismiss()
+            currentDialog?.dismiss()
             show()
         } catch (e: Exception) {
             e.printStackTrace()
