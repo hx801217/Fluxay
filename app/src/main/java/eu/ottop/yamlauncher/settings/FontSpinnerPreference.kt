@@ -107,19 +107,59 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
         try {
             Log.d(TAG, "Opening font picker")
 
+            // Try ACTION_OPEN_DOCUMENT first (for Android 4.4+)
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 type = "*/*"
                 addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                    "font/ttf",
+                    "font/otf",
+                    "font/woff",
+                    "font/woff2",
+                    "application/x-font-ttf",
+                    "application/x-font-opentype",
+                    "application/font-woff",
+                    "application/font-woff2"
+                ))
             }
 
-            callback?.startActivityForResultForFontPicker(intent, REQUEST_CODE_PICK_FONT)
-                ?: run {
-                    Log.e(TAG, "Callback is null, cannot open font picker")
-                    Toast.makeText(context, "Font picker not available", Toast.LENGTH_SHORT).show()
+            // Check if there's an activity to handle the intent
+            val packageManager = context.packageManager
+            val activities = packageManager.queryIntentActivities(intent, 0)
+
+            if (activities.isNotEmpty()) {
+                Log.d(TAG, "Found ${activities.size} activities for ACTION_OPEN_DOCUMENT")
+                callback?.startActivityForResultForFontPicker(intent, REQUEST_CODE_PICK_FONT)
+            } else {
+                Log.d(TAG, "No activities found for ACTION_OPEN_DOCUMENT, trying ACTION_GET_CONTENT")
+                // Fallback to ACTION_GET_CONTENT (for Android 8.0 compatibility)
+                val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "*/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                        "font/ttf",
+                        "font/otf",
+                        "font/woff",
+                        "font/woff2",
+                        "application/x-font-ttf",
+                        "application/x-font-opentype",
+                        "application/font-woff",
+                        "application/font-woff2"
+                    ))
                 }
+                val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
+
+                if (fallbackActivities.isNotEmpty()) {
+                    Log.d(TAG, "Found ${fallbackActivities.size} activities for ACTION_GET_CONTENT")
+                    callback?.startActivityForResultForFontPicker(fallbackIntent, REQUEST_CODE_PICK_FONT)
+                } else {
+                    Log.e(TAG, "No activities found for file picking")
+                    Toast.makeText(context, "No file picker available on this device", Toast.LENGTH_LONG).show()
+                }
+            }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open font picker", e)
-            Toast.makeText(context, "Failed to open file picker", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Failed to open file picker: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
