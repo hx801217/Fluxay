@@ -11,8 +11,8 @@ android {
         applicationId = "eu.ottop.yamlauncher"
         minSdk = 24
         targetSdk = 36
-        versionCode = 13
-        versionName = "1.8"
+        versionCode = 12
+        versionName = "1.2"
     }
 
     dependenciesInfo {
@@ -38,6 +38,16 @@ android {
             )
             resValue("string", "app_name", "YAM Launcher")
         }
+    }
+
+    applicationVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                val outputFileName = "Fluxay-Launcher-${variant.versionName}.apk"
+                output.outputFileName = outputFileName
+            }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
