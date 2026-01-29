@@ -42,6 +42,15 @@
         <item>Bold-Italic</item>
     </string-array>
 
+    <string-array name="animation_options">
+        <item>Off</item>
+        <item>0.25x</item>
+        <item>0.5x</item>
+        <item>1x</item>
+        <item>2x</item>
+        <item>4x</item>
+    </string-array>
+
     <!--Home and App Menu-->
     <string-array name="h_alignment_options">
         <item>Left</item>

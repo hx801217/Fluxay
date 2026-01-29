@@ -32,6 +32,7 @@
         <item>Ubuntu Light</item>
         <item>Ubuntu Condensed Regular</item>
         <item>Workbench</item>
+        <item>自定义</item>
     </string-array>
 
     <string-array name="style_options">
@@ -39,6 +40,15 @@
         <item>粗体</item>
         <item>斜体</item>
         <item>粗斜体</item>
+    </string-array>
+
+    <string-array name="animation_options">
+        <item>关闭</item>
+        <item>0.25x</item>
+        <item>0.5x</item>
+        <item>1x</item>
+        <item>2x</item>
+        <item>4x</item>
     </string-array>
 
     <!--Home and App Menu-->

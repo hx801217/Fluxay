@@ -105,6 +105,5 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     override fun onAttached() {
         super.onAttached()
         currentValue = getPersistedString(defaultNo)
-        persistString(getPersistedString(defaultNo))
     }
 }

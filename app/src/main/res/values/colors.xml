@@ -2,4 +2,5 @@
 <resources>
     <color name="settings_bg">#FFFFFFFF</color>
     <color name="settings_bg_semi_transparent">#80FFFFFF</color>
+    <color name="settings_text_color">#FF000000</color>
 </resources>

@@ -43,15 +43,8 @@
         <item>bold-italic</item>
     </string-array>
 
-    <string-array name="animation_options" translatable="false">
-        <item>0.25x</item>
-        <item>0.5x</item>
-        <item>1x</item>
-        <item>2x</item>
-        <item>4x</item>
-    </string-array>
-
     <string-array name="animation_values" translatable="false">
+        <item>0</item>
         <item>800</item>
         <item>400</item>
         <item>200</item>
@@ -60,6 +53,7 @@
     </string-array>
 
     <string-array name="swipe_values" translatable="false">
+        <item>0</item>
         <item>25</item>
         <item>50</item>
         <item>100</item>
