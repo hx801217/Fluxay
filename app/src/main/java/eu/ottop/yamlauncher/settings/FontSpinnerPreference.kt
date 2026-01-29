@@ -158,10 +158,15 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
             // Set the custom font as the current value
             val fontPath = "custom:$fileName"
+            Log.d(TAG, "Saving font path: $fontPath")
+
             if (callChangeListener(fontPath)) {
                 currentValue = fontPath
                 persistString(fontPath)
                 summary = "Custom: $fileName"
+                Log.d(TAG, "Font path saved successfully: $fontPath")
+            } else {
+                Log.w(TAG, "callChangeListener returned false, font not saved")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to import font", e)

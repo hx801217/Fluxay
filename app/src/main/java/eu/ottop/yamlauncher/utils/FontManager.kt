@@ -27,23 +27,35 @@ class FontManager private constructor(private val context: Context) {
 
     fun getFont(fontName: String): Typeface? {
         return try {
+            android.util.Log.d("FontManager", "Loading font: $fontName")
+
             when {
-                fontName == "system" -> null
+                fontName == "system" -> {
+                    android.util.Log.d("FontManager", "Font is system, returning null")
+                    null
+                }
                 fontName.startsWith("custom:") -> {
                     val fileName = fontName.substringAfter("custom:")
                     val fontFile = File(customFontDir, fileName)
+                    android.util.Log.d("FontManager", "Looking for custom font file: ${fontFile.absolutePath}")
+
                     if (fontFile.exists()) {
-                        Typeface.createFromFile(fontFile)
+                        val typeface = Typeface.createFromFile(fontFile)
+                        android.util.Log.d("FontManager", "Successfully loaded custom font from file")
+                        typeface
                     } else {
+                        android.util.Log.e("FontManager", "Custom font file does not exist: ${fontFile.absolutePath}")
                         null
                     }
                 }
                 else -> {
                     // Handle built-in fonts
+                    android.util.Log.d("FontManager", "Loading built-in font: $fontName")
                     Typeface.create(fontName, Typeface.NORMAL)
                 }
             }
         } catch (e: Exception) {
+            android.util.Log.e("FontManager", "Failed to load font: $fontName", e)
             e.printStackTrace()
             null
         }

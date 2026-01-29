@@ -10,6 +10,7 @@ import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Build
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -216,6 +217,8 @@ class UIUtils(private val context: Context) {
         val font = sharedPreferenceManager.getTextFont()
         val style = sharedPreferenceManager.getTextStyle()
 
+        Log.d("UIUtils", "Setting font: $font, style: $style")
+
         val newFont: Typeface = when {
             font == "system" -> {
                 val typedArray = context.obtainStyledAttributes(android.R.style.TextAppearance_DeviceDefault, intArrayOf(android.R.attr.fontFamily))
@@ -236,15 +239,22 @@ class UIUtils(private val context: Context) {
                 Typeface.create(font, Typeface.NORMAL)
             }
             font?.startsWith("custom:") == true -> {
-                val fontName = font.substringAfter("custom:")
                 val fontManager = FontManager.getInstance(context)
-                fontManager.getFont(fontName) ?: Typeface.DEFAULT
+                val customTypeface = fontManager.getFont(font)
+                if (customTypeface != null) {
+                    Log.d("UIUtils", "Successfully loaded custom font: $font")
+                    customTypeface
+                } else {
+                    Log.e("UIUtils", "Failed to load custom font: $font")
+                    Typeface.DEFAULT
+                }
             }
             else -> {
                 val fontId = FontMap.fonts[font]
                 if (fontId != null) {
                     ResourcesCompat.getFont(context, fontId) ?: Typeface.DEFAULT
                 } else {
+                    Log.w("UIUtils", "Font not found in FontMap: $font, using default")
                     Typeface.DEFAULT
                 }
             }
