@@ -1,0 +1,36 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.YamLauncher" parent="Theme.Material3.DynamicColors.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@android:color/transparent</item>
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="colorAccent">#FF80CBC4</item>
+    </style>
+
+    <style name="SettingsTheme" parent="Theme.AppCompat">
+        <item name="android:windowBackground">@color/settings_bg</item>
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="actionBarStyle">@style/TransparentActionBar</item>
+    </style>
+
+    <style name="TransparentActionBar" parent="Widget.AppCompat.ActionBar">
+        <!-- Transparent background for ActionBar -->
+        <item name="background">@android:color/transparent</item>
+    </style>
+
+    <style name="Theme.YamLauncher" parent="Base.Theme.YamLauncher" />
+</resources>

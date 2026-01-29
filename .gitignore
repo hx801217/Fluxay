@@ -1,0 +1,36 @@
+.gradle/
+.idea/
+local.properties
+uploadkey.jks
+keystore.properties
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+app/build/
+build/
+
+# Keystore files
+*.jks
+
+# Temporary files
+*.log
+*.tmp
+
+# Generated files
+gen/
+out/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# PowerShell
+*.ps1~
+
+# Rename scripts
+rename_packages.ps1
+rename_packages.sh

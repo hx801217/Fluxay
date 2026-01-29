@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- EINK Refresh Mode -->
+    <string-array name="eink_refresh_mode_entries">
+        <item>全局刷新</item>
+        <item>局部刷新</item>
+        <item>无刷新</item>
+    </string-array>
+
+    <string-array name="eink_refresh_mode_values">
+        <item>global</item>
+        <item>partial</item>
+        <item>none</item>
+    </string-array>
+
+    <!-- Chinese Date Format -->
+    <string-array name="chinese_date_format_entries">
+        <item>2026年1月29日 星期四</item>
+        <item>2026年1月29日</item>
+        <item>1月29日</item>
+    </string-array>
+
+    <string-array name="chinese_date_format_values">
+        <item>full</item>
+        <item>medium</item>
+        <item>short</item>
+    </string-array>
+</resources>
