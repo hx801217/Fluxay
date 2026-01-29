@@ -155,47 +155,10 @@
     <string name="hidden_confirm_text">您确定要显示</string>
 
     <string name="about">关于</string>
-
-    <!-- EINK Settings -->
-    <string name="eink_settings_title">EINK设置</string>
-    <string name="eink_settings_text">EINK显示</string>
-    <string name="eink_settings_summary">电子墨水屏显示优化</string>
-
-    <string name="eink_mode">启用EINK模式</string>
-    <string name="eink_mode_summary">优化电子墨水屏显示效果</string>
-
-    <string name="eink_high_contrast">高对比度模式</string>
-    <string name="eink_high_contrast_summary">使用纯黑白显示，提高可读性</string>
-
-    <string name="eink_refresh_mode">刷新模式</string>
-    <string name="eink_refresh_mode_summary">选择EINK屏幕刷新模式</string>
-    <string name="eink_refresh_global">全局刷新</string>
-    <string name="eink_refresh_partial">局部刷新</string>
-    <string name="eink_refresh_none">无刷新</string>
-
-    <string name="enable_custom_font">使用自定义字体</string>
-    <string name="enable_custom_font_summary">启用本地字体文件</string>
-
-    <string name="select_font">选择字体</string>
-    <string name="select_font_summary">点击选择本地字体文件</string>
-
-    <string name="reset_font">重置字体</string>
-    <string name="reset_font_summary">恢复为默认字体</string>
-
-    <string name="chinese_date_format">日期格式</string>
-    <string name="chinese_date_format_summary">选择简体中文日期显示格式</string>
-    <string name="date_format_full">2026年1月29日 星期四</string>
-    <string name="date_format_medium">2026年1月29日</string>
-    <string name="date_format_short">1月29日</string>
-
-    <string name="font_selection_title">选择字体文件</string>
-    <string name="font_selection_error">不支持的字体文件格式</string>
-    <string name="font_selection_success">字体已应用，重启后生效</string>
-
     <!--About Page Items-->
-    <string name="about_title">关于 EINK Launcher</string>
+    <string name="about_title">关于 YAM Launcher</string>
     <string name="app_icon">应用图标</string>
-    <string name="creditName">专为EINK设备优化的Android启动器</string>
+    <string name="creditName">由Otto创建，ThomasNow Productions维护</string>
     <string name="source_code">源代码</string>
     <string name="codeberg">Codeberg</string>
     <string name="github">GitHub</string>
@@ -205,7 +168,7 @@
     <string name="install_play">在Google Play上安装</string>
 
     <string name="reset">重置</string>
-    <string name="restart_text">重启 EINK Launcher</string>
+    <string name="restart_text">重启 YAM Launcher</string>
     <string name="reset_text">重置所有设置</string>
     <string name="reset_confirm_text">您将丢失所有对启动器设置、快捷方式、隐藏应用等所做的更改。\n\n您确定吗？</string>
 

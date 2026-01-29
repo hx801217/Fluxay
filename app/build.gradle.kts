@@ -4,25 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.eink.launcher"
+    namespace = "eu.ottop.yamlauncher"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.eink.launcher"
-        minSdk = 21  // Android 5.0 Lollipop - 兼容Android Go设备
+        applicationId = "eu.ottop.yamlauncher"
+        minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
-
-        vectorDrawables {
-            useSupportLibrary = true
-        }
-
-        // Android Go 优化配置
-        ndk {
-            abiFilters.add("armeabi-v7a")
-            abiFilters.add("arm64-v8a")
-        }
+        versionCode = 13
+        versionName = "1.8"
     }
 
     dependenciesInfo {
@@ -34,7 +24,7 @@ android {
         debug {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            resValue("string", "app_name", "EINK Launcher Dev")
+            resValue("string", "app_name", "YAM Launcher Dev")
         }
 
         release {
@@ -46,25 +36,18 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            resValue("string", "app_name", "EINK Launcher")
+            resValue("string", "app_name", "YAM Launcher")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        jvmToolchain(17)
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures {
         viewBinding = true
-    }
-}
-
-android {
-    lint {
-        abortOnError = false
-        checkReleaseBuilds = false
     }
 }
 

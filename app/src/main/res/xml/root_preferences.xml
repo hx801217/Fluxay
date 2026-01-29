@@ -24,13 +24,6 @@
         <Preference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="einkSettings"
-            app:selectable="true"
-            app:summary="@string/eink_settings_summary"
-            app:title="@string/eink_settings_text" />
-        <Preference
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             app:key="uiSettings"
             app:selectable="true"
             app:summary="@string/ui_settings_summary"

@@ -155,47 +155,10 @@
     <string name="hidden_confirm_text">Are you sure you want to unhide</string>
 
     <string name="about">About</string>
-
-    <!-- EINK Settings -->
-    <string name="eink_settings_title">EINK Settings</string>
-    <string name="eink_settings_text">EINK Display</string>
-    <string name="eink_settings_summary">Optimize for electronic ink screens</string>
-
-    <string name="eink_mode">Enable EINK Mode</string>
-    <string name="eink_mode_summary">Optimize display for electronic ink screens</string>
-
-    <string name="eink_high_contrast">High Contrast Mode</string>
-    <string name="eink_high_contrast_summary">Use pure black and white for better readability</string>
-
-    <string name="eink_refresh_mode">Refresh Mode</string>
-    <string name="eink_refresh_mode_summary">Choose EINK screen refresh mode</string>
-    <string name="eink_refresh_global">Global Refresh</string>
-    <string name="eink_refresh_partial">Partial Refresh</string>
-    <string name="eink_refresh_none">No Refresh</string>
-
-    <string name="enable_custom_font">Use Custom Font</string>
-    <string name="enable_custom_font_summary">Enable local font file</string>
-
-    <string name="select_font">Select Font</string>
-    <string name="select_font_summary">Click to select local font file</string>
-
-    <string name="reset_font">Reset Font</string>
-    <string name="reset_font_summary">Restore to default font</string>
-
-    <string name="chinese_date_format">Date Format</string>
-    <string name="chinese_date_format_summary">Choose simplified Chinese date display format</string>
-    <string name="date_format_full">2026年1月29日 星期四</string>
-    <string name="date_format_medium">2026年1月29日</string>
-    <string name="date_format_short">1月29日</string>
-
-    <string name="font_selection_title">Select Font File</string>
-    <string name="font_selection_error">Unsupported font file format</string>
-    <string name="font_selection_success">Font applied, restart to take effect</string>
-
     <!--About Page Items-->
-    <string name="about_title">About EINK Launcher</string>
+    <string name="about_title">About YAM Launcher</string>
     <string name="app_icon">App Icon</string>
-    <string name="creditName">Android launcher optimized for EINK devices</string>
+    <string name="creditName">created by Otto, maintained by ThomasNow Productions</string>
     <string name="source_code">Source Code</string>
     <string name="codeberg">Codeberg</string>
     <string name="github">GitHub</string>
@@ -205,7 +168,7 @@
     <string name="install_play">Install on Google Play</string>
 
     <string name="reset">Reset</string>
-    <string name="restart_text">Restart EINK Launcher</string>
+    <string name="restart_text">Restart YAM Launcher</string>
     <string name="reset_text">Reset All Settings</string>
     <string name="reset_confirm_text">You will lose ALL changes that you have made to the launcher settings, shortcuts, hidden apps, etc.\n\nAre you sure?</string>
 
@@ -234,4 +197,10 @@
     <string name="text_biometric_login">Unlock YAM Launcher Settings</string>
     <string name="text_biometric_login_app">Biometric login for %1$s</string>
     <string name="text_biometric_login_sub">Log in using your biometric credentials.</string>
+
+    <!-- Custom Font -->
+    <string name="select_custom_font">Select Custom Font</string>
+    <string name="import_font">Import Font</string>
+    <string name="installed_fonts">Installed Fonts</string>
+    <string name="cancel">Cancel</string>
 </resources>

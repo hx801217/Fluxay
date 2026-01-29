@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "EINK Launcher"
+rootProject.name = "Yam Launcher"
 include(":app")

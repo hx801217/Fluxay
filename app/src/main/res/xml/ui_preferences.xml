@@ -24,7 +24,7 @@
             app:key="textColor"
             app:title="@string/text_color"
             app:useSimpleSummaryProvider="true" />
-        <eu.ottop.yamlauncher.settings.SpinnerPreference
+        <eu.ottop.yamlauncher.settings.FontSpinnerPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:defaultValue="system"
