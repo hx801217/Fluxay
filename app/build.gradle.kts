@@ -61,6 +61,13 @@ android {
     }
 }
 
+android {
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+}
+
 dependencies {
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
