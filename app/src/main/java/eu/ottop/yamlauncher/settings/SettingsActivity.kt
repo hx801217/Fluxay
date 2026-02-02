@@ -214,7 +214,10 @@ class SettingsActivity : AppCompatActivity() {
             } catch(e: IllegalArgumentException) {
                 Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
             }
+        } catch(e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
+    }
 
     private fun readJsonFile(uri: Uri): String? {
         return try {
