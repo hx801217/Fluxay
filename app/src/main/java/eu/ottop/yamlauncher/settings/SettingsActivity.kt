@@ -293,22 +293,26 @@ class SettingsActivity : AppCompatActivity() {
 
 
         if (requestCode == 0) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as HomeSettingsFragment
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fragment.setLocationPreference(true)
-            } else {
-                Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
-                fragment.setLocationPreference(false)
+            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout)
+            if (fragment is HomeSettingsFragment) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fragment.setLocationPreference(true)
+                } else {
+                    Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+                    fragment.setLocationPreference(false)
+                }
             }
         }
 
         if (requestCode == 1) {
-            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout) as AppMenuSettingsFragment
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                fragment.setContactPreference(true)
-            } else {
-                Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
-                fragment.setContactPreference(false)
+            val fragment = supportFragmentManager.findFragmentById(R.id.settingsLayout)
+            if (fragment is AppMenuSettingsFragment) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    fragment.setContactPreference(true)
+                } else {
+                    Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
+                    fragment.setContactPreference(false)
+                }
             }
         }
     }

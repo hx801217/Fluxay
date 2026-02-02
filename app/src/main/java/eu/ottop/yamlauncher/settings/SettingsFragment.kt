@@ -66,12 +66,28 @@ class SettingsFragment : PreferenceFragmentCompat(), TitleProvider {
 
         backupPref?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
-                (requireActivity() as SettingsActivity).createBackup()
+                try {
+                    val activity = requireActivity()
+                    if (activity is SettingsActivity) {
+                        activity.createBackup()
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsFragment", "Backup failed", e)
+                    Toast.makeText(requireContext(), "Failed to open backup: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
                 true }
 
         restorePref?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
-                (requireActivity() as SettingsActivity).restoreBackup()
+                try {
+                    val activity = requireActivity()
+                    if (activity is SettingsActivity) {
+                        activity.restoreBackup()
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsFragment", "Restore failed", e)
+                    Toast.makeText(requireContext(), "Failed to open restore: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
                 true }
 
         aboutPref?.onPreferenceClickListener =
