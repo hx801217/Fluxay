@@ -29,6 +29,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     private var spinner: Spinner? = null
     private var callback: FontPickerCallback? = null
     private var isUserAction = false // Flag to distinguish between user action and programmatic changes
+    private var isInitializing = true // Flag to prevent opening picker during initialization
 
     companion object {
         private const val TAG = "FontSpinnerPreference"
@@ -74,10 +75,17 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             if (selectedIndex >= 0) {
                 summary = entries?.get(selectedIndex)
             }
+            isInitializing = false
         }, 0)
 
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                // Skip during initialization to prevent triggering picker when settings open
+                if (isInitializing) {
+                    Log.d(TAG, "Skipping selection during initialization")
+                    return@onItemSelected
+                }
+
                 val newValue = entryValues?.get(position).toString()
 
                 // Check if custom font is selected
