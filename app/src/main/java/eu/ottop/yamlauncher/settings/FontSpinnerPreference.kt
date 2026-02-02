@@ -28,8 +28,8 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     private var defaultNo: String? = null
     private var spinner: Spinner? = null
     private var callback: FontPickerCallback? = null
-    private var isUserAction = false // Flag to distinguish between user action and programmatic changes
     private var isInitializing = true // Flag to prevent opening picker during initialization
+    private var isSettingSelectionProgrammatically = false // Flag to track programmatic selection
 
     companion object {
         private const val TAG = "FontSpinnerPreference"
@@ -67,40 +67,19 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, entries!!)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner?.adapter = adapter
-
-            // Log array contents for debugging
-            Log.d(TAG, "Entries size: ${entries!!.size}")
-            entries!!.forEachIndexed { index, entry ->
-                Log.d(TAG, "Entry[$index]: $entry")
-            }
-            Log.d(TAG, "EntryValues size: ${entryValues!!.size}")
-            entryValues!!.forEachIndexed { index, value ->
-                Log.d(TAG, "Value[$index]: $value")
-            }
         }
 
         val selectedIndex = calculateSelectedIndex()
 
-        // First set the selection
-        spinner?.setSelection(selectedIndex)
-
-        val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        handler.postDelayed({
-            if (selectedIndex >= 0) {
-                // If using custom font, show filename; otherwise show entry name
-                summary = if (currentValue?.startsWith("custom:") == true) {
-                    val fileName = currentValue?.substringAfter(":") ?: ""
-                    "Custom: $fileName"
-                } else {
-                    entries?.get(selectedIndex)?.toString() ?: ""
-                }
-            }
-            isInitializing = false // End initialization after setting the value
-        }, 0)
-
-        // Set the listener AFTER setting the selection (like in SpinnerPreference)
+        // Set the listener FIRST
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                // Skip if this is a programmatic selection
+                if (isSettingSelectionProgrammatically) {
+                    Log.d(TAG, "Skipping programmatic selection, position=$position")
+                    return@onItemSelected
+                }
+
                 // Skip during initialization to prevent triggering picker when settings open
                 if (isInitializing) {
                     Log.d(TAG, "Skipping selection during initialization, position=$position")
@@ -108,9 +87,6 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                 }
 
                 Log.d(TAG, "onItemSelected: position=$position, id=$id")
-                Log.d(TAG, "clicked entry: ${entries?.get(position)}")
-                Log.d(TAG, "clicked value: ${entryValues?.get(position)}")
-
                 val newValue = entryValues?.get(position).toString()
                 Log.d(TAG, "newValue=$newValue, currentValue=$currentValue")
 
@@ -121,8 +97,10 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                     // Reset to current value until user selects a font
                     val currentSelectedIndex = calculateSelectedIndex()
                     Log.d(TAG, "Resetting to index: $currentSelectedIndex")
+                    isSettingSelectionProgrammatically = true
                     spinner?.post {
                         spinner?.setSelection(currentSelectedIndex)
+                        isSettingSelectionProgrammatically = false
                     }
                     return@onItemSelected
                 }
@@ -137,6 +115,29 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        // Then set the selection
+        isSettingSelectionProgrammatically = true
+        spinner?.setSelection(selectedIndex)
+        isSettingSelectionProgrammatically = false
+
+        // Set summary and end initialization immediately
+        if (selectedIndex >= 0) {
+            // If using custom font, show filename; otherwise show entry name
+            summary = if (currentValue?.startsWith("custom:") == true) {
+                val fileName = currentValue?.substringAfter(":") ?: ""
+                "Custom: $fileName"
+            } else {
+                entries?.get(selectedIndex)?.toString() ?: ""
+            }
+        }
+
+        // End initialization after a short delay to ensure all events are processed
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        handler.postDelayed({
+            isInitializing = false // End initialization
+            Log.d(TAG, "Initialization complete")
+        }, 100)
     }
 
     private fun openFontPicker() {
