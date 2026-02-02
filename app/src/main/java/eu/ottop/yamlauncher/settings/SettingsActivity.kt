@@ -61,11 +61,15 @@ class SettingsActivity : AppCompatActivity() {
         performBackup = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-                    // Take persistable URI permission for Android 8.0+
-                    contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-                    )
+                    try {
+                        // Take persistable URI permission for Android 8.0+
+                        contentResolver.takePersistableUriPermission(
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    } catch (e: SecurityException) {
+                        android.util.Log.w("SettingsActivity", "URI permission not persistable", e)
+                    }
                     saveSharedPreferencesToFile(uri)
                 }
             }
@@ -74,11 +78,15 @@ class SettingsActivity : AppCompatActivity() {
         performRestore = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
-                    // Take persistable URI permission for Android 8.0+
-                    contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
+                    try {
+                        // Take persistable URI permission for Android 8.0+
+                        contentResolver.takePersistableUriPermission(
+                            uri,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        )
+                    } catch (e: SecurityException) {
+                        android.util.Log.w("SettingsActivity", "URI permission not persistable", e)
+                    }
                     restoreSharedPreferencesFromFile(uri)
                 }
             }
@@ -103,6 +111,7 @@ class SettingsActivity : AppCompatActivity() {
 
     fun createBackup() {
         try {
+            android.util.Log.d("SettingsActivity", "Starting backup")
             // Try ACTION_CREATE_DOCUMENT (Android 4.4+)
             val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -114,10 +123,12 @@ class SettingsActivity : AppCompatActivity() {
             // Check if there's an activity to handle the intent
             val packageManager = packageManager
             val activities = packageManager.queryIntentActivities(createFileIntent, 0)
+            android.util.Log.d("SettingsActivity", "Found ${activities.size} activities for ACTION_CREATE_DOCUMENT")
 
             if (activities.isNotEmpty()) {
                 performBackup.launch(createFileIntent)
             } else {
+                android.util.Log.w("SettingsActivity", "No activities found for ACTION_CREATE_DOCUMENT")
                 Toast.makeText(this, "Backup not available on this device", Toast.LENGTH_LONG).show()
             }
         } catch (e: Exception) {
@@ -168,6 +179,7 @@ class SettingsActivity : AppCompatActivity() {
 
     fun restoreBackup() {
         try {
+            android.util.Log.d("SettingsActivity", "Starting restore")
             // Try ACTION_OPEN_DOCUMENT (Android 4.4+)
             val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -178,10 +190,12 @@ class SettingsActivity : AppCompatActivity() {
             // Check if there's an activity to handle the intent
             val packageManager = packageManager
             val activities = packageManager.queryIntentActivities(openFileIntent, 0)
+            android.util.Log.d("SettingsActivity", "Found ${activities.size} activities for ACTION_OPEN_DOCUMENT")
 
             if (activities.isNotEmpty()) {
                 performRestore.launch(openFileIntent)
             } else {
+                android.util.Log.w("SettingsActivity", "No activities found for ACTION_OPEN_DOCUMENT")
                 Toast.makeText(this, "Restore not available on this device", Toast.LENGTH_LONG).show()
             }
         } catch (e: Exception) {
