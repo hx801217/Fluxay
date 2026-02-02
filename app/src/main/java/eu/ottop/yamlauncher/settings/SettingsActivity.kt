@@ -216,6 +216,7 @@ class SettingsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(this, getString(R.string.restore_fail), Toast.LENGTH_SHORT).show()
             }
+        }
         } else {
             Toast.makeText(this, getString(R.string.restore_error), Toast.LENGTH_SHORT).show()
         }
