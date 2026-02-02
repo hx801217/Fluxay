@@ -42,7 +42,14 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
                 gpsLocationPref?.onPreferenceChangeListener =
                     Preference.OnPreferenceChangeListener { _, newValue ->
                         if (newValue as Boolean && !permissionUtils.hasPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                            (requireActivity() as SettingsActivity).requestLocationPermission()
+                            try {
+                                val activity = requireActivity()
+                                if (activity is SettingsActivity) {
+                                    activity.requestLocationPermission()
+                                }
+                            } catch (e: Exception) {
+                                android.util.Log.e("HomeSettingsFragment", "Request location permission failed", e)
+                            }
                             return@OnPreferenceChangeListener false
                         } else {
                             manualLocationPref?.isEnabled = !newValue
