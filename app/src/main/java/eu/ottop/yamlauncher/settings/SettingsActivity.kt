@@ -61,6 +61,11 @@ class SettingsActivity : AppCompatActivity() {
         performBackup = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
+                    // Take persistable URI permission for Android 8.0+
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
                     saveSharedPreferencesToFile(uri)
                 }
             }
@@ -69,6 +74,11 @@ class SettingsActivity : AppCompatActivity() {
         performRestore = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 result.data?.data?.let { uri ->
+                    // Take persistable URI permission for Android 8.0+
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
                     restoreSharedPreferencesFromFile(uri)
                 }
             }
@@ -99,6 +109,7 @@ class SettingsActivity : AppCompatActivity() {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"
                 putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+                addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             // Check if there's an activity to handle the intent
@@ -162,6 +173,7 @@ class SettingsActivity : AppCompatActivity() {
             val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
 
             // Check if there's an activity to handle the intent
