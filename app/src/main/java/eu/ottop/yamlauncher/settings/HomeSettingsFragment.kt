@@ -2,6 +2,7 @@ package eu.ottop.yamlauncher.settings
 
 import android.Manifest
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
@@ -43,10 +44,11 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
                     Preference.OnPreferenceChangeListener { _, newValue ->
                         if (newValue as Boolean && !permissionUtils.hasPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)) {
                             try {
-                                val activity = requireActivity()
-                                if (activity is SettingsActivity) {
-                                    activity.requestLocationPermission()
-                                }
+                                ActivityCompat.requestPermissions(
+                                    requireActivity(),
+                                    arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+                                    0
+                                )
                             } catch (e: Exception) {
                                 android.util.Log.e("HomeSettingsFragment", "Request location permission failed", e)
                             }

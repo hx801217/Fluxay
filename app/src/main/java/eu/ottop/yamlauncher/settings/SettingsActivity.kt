@@ -231,26 +231,31 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun readJsonFile(uri: Uri): String? {
-        return try {
-            val inputStream = contentResolver.openInputStream(uri)
-            if (inputStream == null) {
-                android.util.Log.w("SettingsActivity", "Input stream is null")
-                return@try null
-            }
-
-            try {
-                val reader = java.io.InputStreamReader(inputStream, "UTF-8")
-                val text = reader.readText()
-                reader.close()
-                inputStream.close()
-                text
-            } catch (e: Exception) {
-                android.util.Log.e("SettingsActivity", "Failed to read stream", e)
-                inputStream.close()
-                null
-            }
+        val inputStream = try {
+            contentResolver.openInputStream(uri)
         } catch (e: Exception) {
             android.util.Log.e("SettingsActivity", "Failed to open JSON file", e)
+            return null
+        }
+
+        if (inputStream == null) {
+            android.util.Log.w("SettingsActivity", "Input stream is null")
+            return null
+        }
+
+        return try {
+            val reader = java.io.InputStreamReader(inputStream, "UTF-8")
+            val text = reader.readText()
+            reader.close()
+            inputStream.close()
+            text
+        } catch (e: Exception) {
+            android.util.Log.e("SettingsActivity", "Failed to read stream", e)
+            try {
+                inputStream.close()
+            } catch (closeEx: Exception) {
+                android.util.Log.e("SettingsActivity", "Failed to close stream", closeEx)
+            }
             null
         }
     }

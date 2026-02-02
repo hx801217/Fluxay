@@ -1,11 +1,13 @@
 package eu.ottop.yamlauncher.settings
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import eu.ottop.yamlauncher.MainActivity
 import eu.ottop.yamlauncher.R
 import eu.ottop.yamlauncher.utils.UIUtils
 
@@ -97,7 +99,27 @@ class SettingsFragment : PreferenceFragmentCompat(), TitleProvider {
 
         restartPref?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
-                (requireActivity() as SettingsActivity).restartApp()
+                try {
+                    val context = requireContext()
+                    val restartIntent = Intent(context, MainActivity::class.java)
+                    restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+                    val flags = android.app.PendingIntent.FLAG_CANCEL_CURRENT or
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                            android.app.PendingIntent.FLAG_IMMUTABLE
+                        } else {
+                            0
+                        }
+
+                    val pendingIntent = android.app.PendingIntent.getActivity(
+                        context, 0, restartIntent, flags
+                    )
+
+                    pendingIntent.send()
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsFragment", "Restart failed", e)
+                    Toast.makeText(requireContext(), "Failed to restart: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
                 true }
 
         resetPref?.onPreferenceClickListener =

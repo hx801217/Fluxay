@@ -2,6 +2,7 @@ package eu.ottop.yamlauncher.settings
 
 import android.Manifest
 import android.os.Bundle
+import androidx.core.app.ActivityCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreference
@@ -26,20 +27,20 @@ class AppMenuSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
         autoLaunchPref = findPreference("autoLaunch")
 
         contactPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-
             if (newValue as Boolean && !permissionUtils.hasPermission(requireContext(), Manifest.permission.READ_CONTACTS)) {
                 try {
-                    val activity = requireActivity()
-                    if (activity is SettingsActivity) {
-                        activity.requestContactsPermission()
-                    }
+                    ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        arrayOf(Manifest.permission.READ_CONTACTS),
+                        1
+                    )
                 } catch (e: Exception) {
                     android.util.Log.e("AppMenuSettingsFragment", "Request contacts permission failed", e)
                 }
-                    return@OnPreferenceChangeListener false
-                } else {
-                    return@OnPreferenceChangeListener true
-                }
+                return@OnPreferenceChangeListener false
+            } else {
+                return@OnPreferenceChangeListener true
+            }
         }
 
         if (webSearchPref != null && autoLaunchPref != null) {
