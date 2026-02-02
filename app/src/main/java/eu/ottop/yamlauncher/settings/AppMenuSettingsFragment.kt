@@ -28,14 +28,7 @@ class AppMenuSettingsFragment : PreferenceFragmentCompat(), TitleProvider {
         contactPref?.onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
 
             if (newValue as Boolean && !permissionUtils.hasPermission(requireContext(), Manifest.permission.READ_CONTACTS)) {
-                try {
-                    val activity = requireActivity()
-                    if (activity is SettingsActivity) {
-                        activity.requestContactsPermission()
-                    }
-                } catch (e: Exception) {
-                    android.util.Log.e("AppMenuSettingsFragment", "Request contacts permission failed", e)
-                }
+                    (requireActivity() as SettingsActivity).requestContactsPermission()
                     return@OnPreferenceChangeListener false
                 } else {
                     return@OnPreferenceChangeListener true
