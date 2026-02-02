@@ -191,9 +191,9 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun restoreSharedPreferencesFromFile(uri: Uri) {
-        val jsonData = readJsonFile(uri)
-        if (jsonData != null) {
-            try {
+        try {
+            val jsonData = readJsonFile(uri)
+            if (jsonData != null) {
                 val backupData = JSONObject(jsonData)
                 if (backupData.getString("app_id") != application.packageName) {
                     throw IllegalArgumentException(getString(R.string.restore_wrong_app))
@@ -222,9 +222,9 @@ class SettingsActivity : AppCompatActivity() {
                 editor.apply()
 
                 Toast.makeText(this, getString(R.string.restore_success), Toast.LENGTH_SHORT).show()
-            } catch(e: IllegalArgumentException) {
-                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
             }
+        } catch(e: IllegalArgumentException) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         } catch(e: Exception) {
             Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
