@@ -93,53 +93,90 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     fun createBackup() {
-        val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
-            putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+        try {
+            // Try ACTION_CREATE_DOCUMENT (Android 4.4+)
+            val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+            }
+
+            // Check if there's an activity to handle the intent
+            val packageManager = packageManager
+            val activities = packageManager.queryIntentActivities(createFileIntent, 0)
+
+            if (activities.isNotEmpty()) {
+                performBackup.launch(createFileIntent)
+            } else {
+                Toast.makeText(this, "Backup not available on this device", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("SettingsActivity", "Backup failed", e)
+            Toast.makeText(this, "Failed to open backup: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        performBackup.launch(createFileIntent)
     }
 
-    private fun saveSharedPreferencesToFile(uri: Uri) {
-        val allEntries = preferences.all
-
-        val backupData = JSONObject().apply {
-            put("app_id", application.packageName)
-            val data = JSONObject()
-            for ((key, value) in allEntries) {
-                val entry = JSONObject().apply {
-                    when (value) {
-                        is String -> put("value", value).put("type", "String")
-                        is Int -> put("value", value).put("type", "Int")
-                        is Boolean -> put("value", value).put("type", "Boolean")
-                        is Long -> put("value", value).put("type", "Long")
-                        is Float -> put("value", value).put("type", "Float")
-                    }
-                }
-                data.put(key, entry)
-            }
-            put("data", data)
+    private fun saveSharedPreferencesToFile(uri: Uri?) {
+        if (uri == null) {
+            Toast.makeText(this, "No file selected", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        val sharedPreferencesText = backupData.toString(4)
-
         try {
+            val allEntries = preferences.all
+
+            val backupData = JSONObject().apply {
+                put("app_id", application.packageName)
+                val data = JSONObject()
+                for ((key, value) in allEntries) {
+                    val entry = JSONObject().apply {
+                        when (value) {
+                            is String -> put("value", value).put("type", "String")
+                            is Int -> put("value", value).put("type", "Int")
+                            is Boolean -> put("value", value).put("type", "Boolean")
+                            is Long -> put("value", value).put("type", "Long")
+                            is Float -> put("value", value).put("type", "Float")
+                        }
+                    }
+                    data.put(key, entry)
+                }
+                put("data", data)
+            }
+
+            val sharedPreferencesText = backupData.toString(4)
+
             contentResolver.openOutputStream(uri)?.use { outputStream ->
                 outputStream.write(sharedPreferencesText.toByteArray())
+                outputStream.flush()
             }
             Toast.makeText(this, getString(R.string.backup_success), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Toast.makeText(this, getString(R.string.backup_fail), Toast.LENGTH_SHORT).show()
+            android.util.Log.e("SettingsActivity", "Backup failed", e)
+            Toast.makeText(this, "${getString(R.string.backup_fail)}: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
     fun restoreBackup() {
-        val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
+        try {
+            // Try ACTION_OPEN_DOCUMENT (Android 4.4+)
+            val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+            }
+
+            // Check if there's an activity to handle the intent
+            val packageManager = packageManager
+            val activities = packageManager.queryIntentActivities(openFileIntent, 0)
+
+            if (activities.isNotEmpty()) {
+                performRestore.launch(openFileIntent)
+            } else {
+                Toast.makeText(this, "Restore not available on this device", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("SettingsActivity", "Restore failed", e)
+            Toast.makeText(this, "Failed to open restore: ${e.message}", Toast.LENGTH_LONG).show()
         }
-        performRestore.launch(openFileIntent)
     }
 
     private fun restoreSharedPreferencesFromFile(uri: Uri) {
@@ -186,10 +223,25 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun readJsonFile(uri: Uri): String? {
         return try {
-            contentResolver.openInputStream(uri)?.bufferedReader().use { reader ->
-                reader?.readText()
+            val inputStream = contentResolver.openInputStream(uri)
+            if (inputStream == null) {
+                android.util.Log.w("SettingsActivity", "Input stream is null")
+                return@try null
+            }
+
+            try {
+                val reader = java.io.InputStreamReader(inputStream, "UTF-8")
+                val text = reader.readText()
+                reader.close()
+                inputStream.close()
+                text
+            } catch (e: Exception) {
+                android.util.Log.e("SettingsActivity", "Failed to read stream", e)
+                inputStream.close()
+                null
             }
         } catch (e: Exception) {
+            android.util.Log.e("SettingsActivity", "Failed to open JSON file", e)
             null
         }
     }
