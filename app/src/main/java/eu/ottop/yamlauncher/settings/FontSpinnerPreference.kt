@@ -59,6 +59,8 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
+        isInitializing = true // Start initialization
+
         spinner = holder.findViewById(R.id.preferenceOptions) as Spinner
 
         if (entries != null) {
@@ -66,17 +68,6 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner?.adapter = adapter
         }
-
-        val selectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: entryValues?.indexOf(defaultNo as CharSequence) ?: 0
-        spinner?.setSelection(selectedIndex)
-
-        val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        handler.postDelayed({
-            if (selectedIndex >= 0) {
-                summary = entries?.get(selectedIndex)
-            }
-            isInitializing = false
-        }, 0)
 
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -109,6 +100,23 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        val selectedIndex = calculateSelectedIndex()
+
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        handler.postDelayed({
+            spinner?.setSelection(selectedIndex)
+            if (selectedIndex >= 0) {
+                // If using custom font, show filename; otherwise show entry name
+                summary = if (currentValue?.startsWith("custom:") == true) {
+                    val fileName = currentValue?.substringAfter(":") ?: ""
+                    "Custom: $fileName"
+                } else {
+                    entries?.get(selectedIndex)?.toString() ?: ""
+                }
+            }
+            isInitializing = false // End initialization after setting the value
+        }, 0)
     }
 
     private fun openFontPicker() {
@@ -252,5 +260,25 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     override fun onAttached() {
         super.onAttached()
         currentValue = getPersistedString(defaultNo)
+    }
+
+    private fun calculateSelectedIndex(): Int {
+        // If current value is a custom font (format: "custom:filename.ttf"), select "custom" option
+        if (currentValue?.startsWith("custom:") == true) {
+            val customIndex = entryValues?.indexOf("custom") ?: -1
+            if (customIndex >= 0) {
+                return customIndex
+            }
+        }
+
+        // Normal case: find the index of current value
+        val currentIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: -1
+        if (currentIndex >= 0) {
+            return currentIndex
+        }
+
+        // Fallback to default value
+        val defaultIndex = entryValues?.indexOf(defaultNo as CharSequence) ?: -1
+        return if (defaultIndex >= 0) defaultIndex else 0
     }
 }
