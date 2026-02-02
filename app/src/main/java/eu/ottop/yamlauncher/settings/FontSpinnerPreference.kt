@@ -135,11 +135,12 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             val packageManager = context.packageManager
             val activities = packageManager.queryIntentActivities(intent, 0)
 
+            Log.d(TAG, "Found ${activities.size} activities for ACTION_OPEN_DOCUMENT")
+
             if (activities.isNotEmpty()) {
-                Log.d(TAG, "Found ${activities.size} activities for ACTION_OPEN_DOCUMENT")
                 callback?.startActivityForResultForFontPicker(intent, REQUEST_CODE_PICK_FONT)
             } else {
-                Log.d(TAG, "No activities found for ACTION_OPEN_DOCUMENT, trying ACTION_GET_CONTENT")
+                Log.w(TAG, "No activities found for ACTION_OPEN_DOCUMENT, trying ACTION_GET_CONTENT")
                 // Fallback to ACTION_GET_CONTENT (for Android 8.0 compatibility)
                 val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
                     type = "*/*"
@@ -156,19 +157,28 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                     ))
                 }
                 val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
+                Log.d(TAG, "Found ${fallbackActivities.size} activities for ACTION_GET_CONTENT")
 
                 if (fallbackActivities.isNotEmpty()) {
-                    Log.d(TAG, "Found ${fallbackActivities.size} activities for ACTION_GET_CONTENT")
                     callback?.startActivityForResultForFontPicker(fallbackIntent, REQUEST_CODE_PICK_FONT)
                 } else {
-                    Log.e(TAG, "No activities found for file picking")
-                    Toast.makeText(context, "No file picker available on this device", Toast.LENGTH_LONG).show()
+                    Log.w(TAG, "No activities found for file picking, showing custom font directory dialog")
+                    // Second fallback: Show dialog with instructions to manually copy font file
+                    showManualFontInstructions()
                 }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open font picker", e)
             Toast.makeText(context, "Failed to open file picker: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+
+    private fun showManualFontInstructions() {
+        android.app.AlertDialog.Builder(context)
+            .setTitle("Custom Font Required")
+            .setMessage("This device doesn't support the file picker.\n\nTo use a custom font:\n1. Copy your font (.ttf, .otf) file to:\n${context.filesDir.absolutePath}/custom_fonts/\n\n2. Then select 'Custom' from the font options.")
+            .setPositiveButton("OK", null)
+            .show()
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

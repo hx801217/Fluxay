@@ -20,6 +20,7 @@ import eu.ottop.yamlauncher.databinding.ActivitySettingsBinding
 import eu.ottop.yamlauncher.utils.PermissionUtils
 import eu.ottop.yamlauncher.utils.UIUtils
 import org.json.JSONObject
+import java.io.File
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -128,8 +129,23 @@ class SettingsActivity : AppCompatActivity() {
             if (activities.isNotEmpty()) {
                 performBackup.launch(createFileIntent)
             } else {
-                android.util.Log.w("SettingsActivity", "No activities found for ACTION_CREATE_DOCUMENT")
-                Toast.makeText(this, "Backup not available on this device", Toast.LENGTH_LONG).show()
+                android.util.Log.w("SettingsActivity", "No activities found for ACTION_CREATE_DOCUMENT, trying fallback")
+                // Fallback: try using traditional file picker or use internal storage
+                try {
+                    val backupDir = File(filesDir, "backups")
+                    if (!backupDir.exists()) {
+                        backupDir.mkdirs()
+                    }
+                    val timestamp = java.text.SimpleDateFormat("yyyyMMdd_HHmmss", java.util.Locale.getDefault()).format(java.util.Date())
+                    val backupFile = File(backupDir, "yamlauncher_backup_$timestamp.json")
+
+                    saveSharedPreferencesToInternalFile(backupFile)
+                    android.util.Log.d("SettingsActivity", "Backup saved to internal storage: ${backupFile.absolutePath}")
+                    Toast.makeText(this, "Backup saved to internal storage: ${backupFile.name}", Toast.LENGTH_LONG).show()
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsActivity", "Fallback backup failed", e)
+                    Toast.makeText(this, "Backup not available on this device", Toast.LENGTH_LONG).show()
+                }
             }
         } catch (e: Exception) {
             android.util.Log.e("SettingsActivity", "Backup failed", e)
@@ -177,6 +193,39 @@ class SettingsActivity : AppCompatActivity() {
         }
     }
 
+    private fun saveSharedPreferencesToInternalFile(file: File) {
+        try {
+            val allEntries = preferences.all
+
+            val backupData = JSONObject().apply {
+                put("app_id", application.packageName)
+                val data = JSONObject()
+                for ((key, value) in allEntries) {
+                    val entry = JSONObject().apply {
+                        when (value) {
+                            is String -> put("value", value).put("type", "String")
+                            is Int -> put("value", value).put("type", "Int")
+                            is Boolean -> put("value", value).put("type", "Boolean")
+                            is Long -> put("value", value).put("type", "Long")
+                            is Float -> put("value", value).put("type", "Float")
+                        }
+                    }
+                    data.put(key, entry)
+                }
+                put("data", data)
+            }
+
+            val sharedPreferencesText = backupData.toString(4)
+
+            file.writeText(sharedPreferencesText)
+            android.util.Log.d("SettingsActivity", "Backup saved to: ${file.absolutePath}")
+            Toast.makeText(this, getString(R.string.backup_success), Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            android.util.Log.e("SettingsActivity", "Internal backup failed", e)
+            Toast.makeText(this, "${getString(R.string.backup_fail)}: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
     fun restoreBackup() {
         try {
             android.util.Log.d("SettingsActivity", "Starting restore")
@@ -195,8 +244,42 @@ class SettingsActivity : AppCompatActivity() {
             if (activities.isNotEmpty()) {
                 performRestore.launch(openFileIntent)
             } else {
-                android.util.Log.w("SettingsActivity", "No activities found for ACTION_OPEN_DOCUMENT")
-                Toast.makeText(this, "Restore not available on this device", Toast.LENGTH_LONG).show()
+                android.util.Log.w("SettingsActivity", "No activities found for ACTION_OPEN_DOCUMENT, trying fallback")
+                // Fallback: try to read from internal storage
+                try {
+                    val backupDir = File(filesDir, "backups")
+                    if (backupDir.exists() && backupDir.isDirectory) {
+                        val backupFiles = backupDir.listFiles { file ->
+                            file.isFile && file.name.startsWith("yamlauncher_backup_") && file.name.endsWith(".json")
+                        }
+
+                        if (backupFiles != null && backupFiles.isNotEmpty()) {
+                            // Sort by last modified, get the most recent
+                            val latestBackup = backupFiles.sortedByDescending { it.lastModified() }.first()
+                            android.util.Log.d("SettingsActivity", "Found latest backup: ${latestBackup.name}")
+
+                            // Show a dialog to confirm restore
+                            androidx.appcompat.app.AlertDialog.Builder(this)
+                                .setTitle("Restore Backup")
+                                .setMessage("Found backup file:\n${latestBackup.name}\n\nRestore from this backup?")
+                                .setPositiveButton("Restore") { _, _ ->
+                                    val uri = android.net.Uri.fromFile(latestBackup)
+                                    restoreSharedPreferencesFromFile(uri)
+                                }
+                                .setNegativeButton("Cancel", null)
+                                .show()
+                        } else {
+                            android.util.Log.w("SettingsActivity", "No backup files found in internal storage")
+                            Toast.makeText(this, "No backup files found", Toast.LENGTH_LONG).show()
+                        }
+                    } else {
+                        android.util.Log.w("SettingsActivity", "Backup directory does not exist")
+                        Toast.makeText(this, "No backup files found", Toast.LENGTH_LONG).show()
+                    }
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsActivity", "Fallback restore failed", e)
+                    Toast.makeText(this, "Restore not available on this device", Toast.LENGTH_LONG).show()
+                }
             }
         } catch (e: Exception) {
             android.util.Log.e("SettingsActivity", "Restore failed", e)
