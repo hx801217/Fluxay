@@ -101,13 +101,19 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-        val selectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: entryValues?.indexOf(defaultNo as CharSequence) ?: 0
+        val selectedIndex = calculateSelectedIndex()
 
         val handler = android.os.Handler(android.os.Looper.getMainLooper())
         handler.postDelayed({
             spinner?.setSelection(selectedIndex)
             if (selectedIndex >= 0) {
-                summary = entries?.get(selectedIndex)
+                // If using custom font, show filename; otherwise show entry name
+                summary = if (currentValue?.startsWith("custom:") == true) {
+                    val fileName = currentValue?.substringAfter(":") ?: ""
+                    "Custom: $fileName"
+                } else {
+                    entries?.get(selectedIndex)?.toString() ?: ""
+                }
             }
             isInitializing = false // End initialization after setting the value
         }, 0)
@@ -254,5 +260,25 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
     override fun onAttached() {
         super.onAttached()
         currentValue = getPersistedString(defaultNo)
+    }
+
+    private fun calculateSelectedIndex(): Int {
+        // If current value is a custom font (format: "custom:filename.ttf"), select "custom" option
+        if (currentValue?.startsWith("custom:") == true) {
+            val customIndex = entryValues?.indexOf("custom") ?: -1
+            if (customIndex >= 0) {
+                return customIndex
+            }
+        }
+
+        // Normal case: find the index of current value
+        val currentIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: -1
+        if (currentIndex >= 0) {
+            return currentIndex
+        }
+
+        // Fallback to default value
+        val defaultIndex = entryValues?.indexOf(defaultNo as CharSequence) ?: -1
+        return if (defaultIndex >= 0) defaultIndex else 0
     }
 }
