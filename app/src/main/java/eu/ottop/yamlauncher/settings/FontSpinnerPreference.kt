@@ -59,6 +59,8 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
+        isInitializing = true // Start initialization
+
         spinner = holder.findViewById(R.id.preferenceOptions) as Spinner
 
         if (entries != null) {
@@ -66,17 +68,6 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner?.adapter = adapter
         }
-
-        val selectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: entryValues?.indexOf(defaultNo as CharSequence) ?: 0
-        spinner?.setSelection(selectedIndex)
-
-        val handler = android.os.Handler(android.os.Looper.getMainLooper())
-        handler.postDelayed({
-            if (selectedIndex >= 0) {
-                summary = entries?.get(selectedIndex)
-            }
-            isInitializing = false
-        }, 0)
 
         spinner?.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
@@ -109,6 +100,17 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
 
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
+
+        val selectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: entryValues?.indexOf(defaultNo as CharSequence) ?: 0
+
+        val handler = android.os.Handler(android.os.Looper.getMainLooper())
+        handler.postDelayed({
+            spinner?.setSelection(selectedIndex)
+            if (selectedIndex >= 0) {
+                summary = entries?.get(selectedIndex)
+            }
+            isInitializing = false // End initialization after setting the value
+        }, 0)
     }
 
     private fun openFontPicker() {
