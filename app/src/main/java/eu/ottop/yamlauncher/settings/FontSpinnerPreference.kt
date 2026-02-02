@@ -67,6 +67,16 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
             val adapter = ArrayAdapter(context, android.R.layout.simple_spinner_item, entries!!)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner?.adapter = adapter
+
+            // Log array contents for debugging
+            Log.d(TAG, "Entries size: ${entries!!.size}")
+            entries!!.forEachIndexed { index, entry ->
+                Log.d(TAG, "Entry[$index]: $entry")
+            }
+            Log.d(TAG, "EntryValues size: ${entryValues!!.size}")
+            entryValues!!.forEachIndexed { index, value ->
+                Log.d(TAG, "Value[$index]: $value")
+            }
         }
 
         val selectedIndex = calculateSelectedIndex()
@@ -97,9 +107,12 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                     return@onItemSelected
                 }
 
-                Log.d(TAG, "onItemSelected: position=$position, currentValue=$currentValue")
+                Log.d(TAG, "onItemSelected: position=$position, id=$id")
+                Log.d(TAG, "clicked entry: ${entries?.get(position)}")
+                Log.d(TAG, "clicked value: ${entryValues?.get(position)}")
+
                 val newValue = entryValues?.get(position).toString()
-                Log.d(TAG, "newValue=$newValue")
+                Log.d(TAG, "newValue=$newValue, currentValue=$currentValue")
 
                 // Check if custom font is selected
                 if (newValue == "custom") {
