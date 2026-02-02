@@ -84,7 +84,7 @@ class FontSpinnerPreference(context: Context, attrs: AttributeSet? = null) : Pre
                     Log.d(TAG, "Custom font selected, opening picker")
                     openFontPicker()
                     // Reset to current value until user selects a font
-                    val currentSelectedIndex = entryValues?.indexOf(currentValue as? CharSequence) ?: 0
+                    val currentSelectedIndex = calculateSelectedIndex()
                     spinner?.post {
                         spinner?.setSelection(currentSelectedIndex)
                     }
