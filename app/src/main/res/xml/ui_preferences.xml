@@ -31,8 +31,7 @@
             android:entries="@array/font_options"
             android:entryValues="@array/font_values"
             app:key="textFont"
-            app:title="@string/text_font"
-            app:useSimpleSummaryProvider="true" />
+            app:title="@string/text_font" />
 
         <eu.ottop.yamlauncher.settings.SpinnerPreference
             android:layout_width="wrap_content"
