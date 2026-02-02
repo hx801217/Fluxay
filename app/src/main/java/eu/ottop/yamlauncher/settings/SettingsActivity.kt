@@ -216,7 +216,6 @@ class SettingsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(this, getString(R.string.restore_fail), Toast.LENGTH_SHORT).show()
             }
-        }
         } else {
             Toast.makeText(this, getString(R.string.restore_error), Toast.LENGTH_SHORT).show()
         }
@@ -271,8 +270,15 @@ class SettingsActivity : AppCompatActivity() {
         val restartIntent = Intent(applicationContext, MainActivity::class.java)
         restartIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 
+        val flags = PendingIntent.FLAG_CANCEL_CURRENT or
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_IMMUTABLE
+            } else {
+                0
+            }
+
         val pendingIntent = PendingIntent.getActivity(
-            applicationContext, 0, restartIntent, PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            applicationContext, 0, restartIntent, flags
         )
 
         pendingIntent.send()
