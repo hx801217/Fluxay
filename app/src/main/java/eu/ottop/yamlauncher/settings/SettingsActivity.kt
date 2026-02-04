@@ -106,42 +106,59 @@ class SettingsActivity : AppCompatActivity() {
             val activities = packageManager.queryIntentActivities(createFileIntent, 0)
             if (activities.isNotEmpty()) {
                 performBackup.launch(createFileIntent)
-            } else {
-                // Fallback: try with wildcard MIME type
-                try {
-                    val fallbackIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "*/*"
-                        putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
-                    }
-                    val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
-                    if (fallbackActivities.isNotEmpty()) {
-                        performBackup.launch(fallbackIntent)
-                    } else {
-                        Toast.makeText(
-                            this,
-                            "No file picker available on this device",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this,
-                        "Failed to open file picker: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                return
+            }
+
+            // Fallback 1: try with wildcard MIME type
+            try {
+                val fallbackIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                    putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
                 }
+                val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
+                if (fallbackActivities.isNotEmpty()) {
+                    performBackup.launch(fallbackIntent)
+                    return
+                }
+            } catch (e: Exception) {
+                // Ignore and try next fallback
+            }
+
+            // Fallback 2: save directly to app's external storage
+            try {
+                val backupData = createBackupJson()
+                val backupDir = java.io.File(getExternalFilesDir(null), "backups")
+                if (!backupDir.exists()) {
+                    backupDir.mkdirs()
+                }
+                val backupFile = java.io.File(backupDir, "yamlauncher_backup_${System.currentTimeMillis()}.json")
+                java.io.FileWriter(backupFile).use { writer ->
+                    writer.write(backupData)
+                }
+                Toast.makeText(
+                    this,
+                    "Backup saved to: ${backupFile.absolutePath}",
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: Exception) {
+                // Fallback 3: show error
+                Toast.makeText(
+                    this,
+                    "No file picker available and failed to save to internal storage",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                "Failed to open file picker: ${e.message}",
+                "Failed to create backup: ${e.message}",
                 Toast.LENGTH_LONG
             ).show()
         }
     }
 
-    private fun saveSharedPreferencesToFile(uri: Uri) {
+    private fun createBackupJson(): String {
         val allEntries = preferences.all
 
         val backupData = JSONObject().apply {
@@ -162,11 +179,14 @@ class SettingsActivity : AppCompatActivity() {
             put("data", data)
         }
 
-        val sharedPreferencesText = backupData.toString(4)
+        return backupData.toString(4)
+    }
 
+    private fun saveSharedPreferencesToFile(uri: Uri) {
         try {
+            val backupData = createBackupJson()
             contentResolver.openOutputStream(uri)?.use { outputStream ->
-                outputStream.write(sharedPreferencesText.toByteArray())
+                outputStream.write(backupData.toByteArray())
             }
             Toast.makeText(this, getString(R.string.backup_success), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
