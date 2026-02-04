@@ -83,14 +83,10 @@ class SettingsActivity : AppCompatActivity() {
     private fun initializeDefaultPreferences() {
         // Only set defaults if they don't already exist
         if (!preferences.contains("bgColor")) {
-            preferences.edit {
-                putString("bgColor", "#FFFFFFFF")
-            }
+            preferences.edit().putString("bgColor", "#FFFFFFFF").apply()
         }
         if (!preferences.contains("textColor")) {
-            preferences.edit {
-                putString("textColor", "#FF000000")
-            }
+            preferences.edit().putString("textColor", "#FF000000").apply()
         }
     }
 
