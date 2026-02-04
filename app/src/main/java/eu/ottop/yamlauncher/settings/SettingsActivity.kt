@@ -98,8 +98,16 @@ class SettingsActivity : AppCompatActivity() {
             // Try ACTION_CREATE_DOCUMENT first (API 19+)
             val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
-                type = "application/json"
+                type = "*/*"
                 putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
+            }
+
+            // Try to launch directly first
+            try {
+                performBackup.launch(createFileIntent)
+                return
+            } catch (e: Exception) {
+                // If launch fails, try checking for activities first
             }
 
             // Check if there's an activity to handle the intent
@@ -109,50 +117,16 @@ class SettingsActivity : AppCompatActivity() {
                 return
             }
 
-            // Fallback 1: try with wildcard MIME type
-            try {
-                val fallbackIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    type = "*/*"
-                    putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
-                }
-                val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
-                if (fallbackActivities.isNotEmpty()) {
-                    performBackup.launch(fallbackIntent)
-                    return
-                }
-            } catch (e: Exception) {
-                // Ignore and try next fallback
-            }
-
-            // Fallback 2: save directly to app's external storage
-            try {
-                val backupData = createBackupJson()
-                val backupDir = java.io.File(getExternalFilesDir(null), "backups")
-                if (!backupDir.exists()) {
-                    backupDir.mkdirs()
-                }
-                val backupFile = java.io.File(backupDir, "yamlauncher_backup_${System.currentTimeMillis()}.json")
-                java.io.FileWriter(backupFile).use { writer ->
-                    writer.write(backupData)
-                }
-                Toast.makeText(
-                    this,
-                    "Backup saved to: ${backupFile.absolutePath}",
-                    Toast.LENGTH_LONG
-                ).show()
-            } catch (e: Exception) {
-                // Fallback 3: show error
-                Toast.makeText(
-                    this,
-                    "No file picker available and failed to save to internal storage",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            // No file picker available
+            Toast.makeText(
+                this,
+                "No file picker available on this device. Please install a file manager app.",
+                Toast.LENGTH_LONG
+            ).show()
         } catch (e: Exception) {
             Toast.makeText(
                 this,
-                "Failed to create backup: ${e.message}",
+                "Failed to open file picker: ${e.message}",
                 Toast.LENGTH_LONG
             ).show()
         }
