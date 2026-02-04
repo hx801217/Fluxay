@@ -95,11 +95,11 @@ class SettingsActivity : AppCompatActivity() {
 
     fun createBackup() {
         try {
-            // Try ACTION_CREATE_DOCUMENT first
+            // Try ACTION_CREATE_DOCUMENT first (API 19+)
             val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = "application/json"
-                putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+                putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
             }
 
             // Check if there's an activity to handle the intent
@@ -107,12 +107,12 @@ class SettingsActivity : AppCompatActivity() {
             if (activities.isNotEmpty()) {
                 performBackup.launch(createFileIntent)
             } else {
-                // Fallback: try ACTION_GET_CONTENT for older devices
+                // Fallback: try with wildcard MIME type
                 try {
-                    val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    val fallbackIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                         addCategory(Intent.CATEGORY_OPENABLE)
-                        type = "application/json"
-                        putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup_${System.currentTimeMillis()}.json")
                     }
                     val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
                     if (fallbackActivities.isNotEmpty()) {
