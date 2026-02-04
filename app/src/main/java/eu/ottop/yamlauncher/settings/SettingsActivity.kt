@@ -39,6 +39,9 @@ class SettingsActivity : AppCompatActivity() {
         sharedPreferenceManager = SharedPreferenceManager(this@SettingsActivity)
         preferences = PreferenceManager.getDefaultSharedPreferences(this@SettingsActivity)
 
+        // Initialize default preferences if they don't exist
+        initializeDefaultPreferences()
+
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -75,6 +78,20 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+    private fun initializeDefaultPreferences() {
+        // Only set defaults if they don't already exist
+        if (!preferences.contains("bgColor")) {
+            preferences.edit {
+                putString("bgColor", "#FFFFFFFF")
+            }
+        }
+        if (!preferences.contains("textColor")) {
+            preferences.edit {
+                putString("textColor", "#FF000000")
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
