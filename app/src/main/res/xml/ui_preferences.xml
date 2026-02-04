@@ -9,7 +9,7 @@
         <eu.ottop.yamlauncher.settings.SpinnerPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="#00000000"
+            android:defaultValue="#FFFFFFFF"
             android:entries="@array/bg_options"
             android:entryValues="@array/bg_values"
             app:key="bgColor"
@@ -18,7 +18,7 @@
         <eu.ottop.yamlauncher.settings.SpinnerPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="#FFF3F3F3"
+            android:defaultValue="#FF000000"
             android:entries="@array/color_options"
             android:entryValues="@array/color_values"
             app:key="textColor"
