@@ -94,12 +94,51 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     fun createBackup() {
-        val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
-            putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+        try {
+            // Try ACTION_CREATE_DOCUMENT first
+            val createFileIntent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+                putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+            }
+
+            // Check if there's an activity to handle the intent
+            val activities = packageManager.queryIntentActivities(createFileIntent, 0)
+            if (activities.isNotEmpty()) {
+                performBackup.launch(createFileIntent)
+            } else {
+                // Fallback: try ACTION_GET_CONTENT for older devices
+                try {
+                    val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/json"
+                        putExtra(Intent.EXTRA_TITLE, "yamlauncher_backup.json")
+                    }
+                    val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
+                    if (fallbackActivities.isNotEmpty()) {
+                        performBackup.launch(fallbackIntent)
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "No file picker available on this device",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this,
+                        "Failed to open file picker: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                this,
+                "Failed to open file picker: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
-        performBackup.launch(createFileIntent)
     }
 
     private fun saveSharedPreferencesToFile(uri: Uri) {
@@ -136,11 +175,49 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     fun restoreBackup() {
-        val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            type = "application/json"
+        try {
+            // Try ACTION_OPEN_DOCUMENT first
+            val openFileIntent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "application/json"
+            }
+
+            // Check if there's an activity to handle the intent
+            val activities = packageManager.queryIntentActivities(openFileIntent, 0)
+            if (activities.isNotEmpty()) {
+                performRestore.launch(openFileIntent)
+            } else {
+                // Fallback: try ACTION_GET_CONTENT for older devices
+                try {
+                    val fallbackIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/json"
+                    }
+                    val fallbackActivities = packageManager.queryIntentActivities(fallbackIntent, 0)
+                    if (fallbackActivities.isNotEmpty()) {
+                        performRestore.launch(fallbackIntent)
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "No file picker available on this device",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this,
+                        "Failed to open file picker: ${e.message}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        } catch (e: Exception) {
+            Toast.makeText(
+                this,
+                "Failed to open file picker: ${e.message}",
+                Toast.LENGTH_LONG
+            ).show()
         }
-        performRestore.launch(openFileIntent)
     }
 
     private fun restoreSharedPreferencesFromFile(uri: Uri) {
